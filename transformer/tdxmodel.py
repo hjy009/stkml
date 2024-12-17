@@ -20,14 +20,15 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'  # Use GPU if it's avail
 TORCH_SEED = 1337
 torch.manual_seed(TORCH_SEED)
 
-stock_k = tdx.get_k(0, '000001', '2018-01-01', '2023-12-31')
+stock_k = tdx.get_k(0, '000001', '1991-05-15','2024-12-31')
 tokenized_text = stock_k['close'].diff()
 tokenized_text.iloc[0] = 0
 tokenized_text = (tokenized_text + 10) * 100
 # tokenized_text = tokenized_text.astype(int)
 # tokenized_text = range(-10,10,0.01)
 tokenized_text = torch.tensor(tokenized_text, dtype=torch.long, device=device)  # put tokenized text into tensor
-max_token_value = max(tokenized_text) + 1  # the maximum value of the tokenized numbers
+# max_token_value = max(tokenized_text) + 1  # the maximum value of the tokenized numbers
+max_token_value = (10 + 10) * 100  # the maximum value of the tokenized numbers
 
 # Split train and validation
 split_idx = int(len(tokenized_text) * 0.9)
@@ -140,7 +141,8 @@ class TransformerLanguageModel(nn.Module):
         self.dropout = dropout
         self.max_token_value = max_token_value
         # Set up token embedding look-up table
-        self.token_embedding_lookup_table = nn.Embedding(num_embeddings=self.max_token_value + 1, embedding_dim=self.d_model)
+        # self.token_embedding_lookup_table = nn.Embedding(num_embeddings=self.max_token_value + 1, embedding_dim=self.d_model)
+        self.token_embedding_lookup_table = nn.Embedding(num_embeddings=self.max_token_value , embedding_dim=self.d_model)
 
         # Run all the transformer blocks
         # Different from original paper, here we add a final layer norm after all the blocks
