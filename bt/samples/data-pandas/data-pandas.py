@@ -59,7 +59,7 @@ def runstrat():
         print(dataframe)
         print('--------------------------------------------------')
 
-    # Pass it to the backtrader datafeed and add it to the cerebro
+    # Pass it to the bt datafeed and add it to the cerebro
     data = bt.feeds.PandasData(dataname=dataframe,
                                # datetime='Date',
                                nocase=True,

@@ -36,7 +36,7 @@ def run(pargs=None):
 
     print('returns is:', returns, ' - retfree is:', retfree)
 
-    # Directly from backtrader
+    # Directly from bt
     retfree = itertools.repeat(retfree)
     ret_free = map(operator.sub, returns, retfree)  # excess returns
     ret_free_avg = average(list(ret_free))  # mean of the excess returns

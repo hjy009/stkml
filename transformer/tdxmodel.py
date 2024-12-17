@@ -1,10 +1,9 @@
-import os
-import requests
 import math
-import tiktoken
 import torch
 import torch.nn as nn
 from torch.nn import functional as F
+# import pandas as pd
+from tdx import tdx
 
 # Hyperparameters
 batch_size = 4  # How many batches per training step
@@ -14,33 +13,26 @@ num_blocks = 8  # Number of transformer blocks
 num_heads = 4  # Number of heads in Multi-head attention
 learning_rate = 1e-3  # 0.001
 dropout = 0.1  # Dropout rate
-max_iters = 5000  # Total of training iterations <- Change this to smaller number for testing
+max_iters = 3000  # Total of training iterations <- Change this to smaller number for testing
 eval_interval = 50  # How often to evaluate
 eval_iters = 20  # Number of iterations to average for evaluation
 device = 'cuda' if torch.cuda.is_available() else 'cpu'  # Use GPU if it's available.
 TORCH_SEED = 1337
 torch.manual_seed(TORCH_SEED)
 
-# Load training data
-if not os.path.exists('../datas/sales_textbook.txt'):
-    url = 'https://huggingface.co/datasets/goendalf666/sales-textbook_for_convincing_and_selling/raw/main/sales_textbook.txt'
-    with open('../datas/sales_textbook.txt', 'w') as f:
-        f.write(requests.get(url).text)
-
-with open('../datas/sales_textbook.txt', 'r', encoding='utf-8') as f:
-    text = f.read()
-
-# Using TikToken (Same as GPT3) to tokenize the source text
-encoding = tiktoken.get_encoding("cl100k_base")
-tokenized_text = encoding.encode(text)
-max_token_value = max(tokenized_text) + 1  # the maximum value of the tokenized numbers
+stock_k = tdx.get_k(0, '000001', '2018-01-01', '2023-12-31')
+tokenized_text = stock_k['close'].diff()
+tokenized_text.iloc[0] = 0
+tokenized_text = (tokenized_text + 10) * 100
+# tokenized_text = tokenized_text.astype(int)
+# tokenized_text = range(-10,10,0.01)
 tokenized_text = torch.tensor(tokenized_text, dtype=torch.long, device=device)  # put tokenized text into tensor
+max_token_value = max(tokenized_text) + 1  # the maximum value of the tokenized numbers
 
 # Split train and validation
 split_idx = int(len(tokenized_text) * 0.9)
 train_data = tokenized_text[:split_idx]
 val_data = tokenized_text[split_idx:]
-
 
 # Define Feed Forward Network
 class FeedForward(nn.Module):
@@ -250,14 +242,14 @@ for step in range(max_iters):
     optimizer.step()
 
 # Save the model state dictionary
-torch.save(model.state_dict(), 'model-ckpt.pt')
+torch.save(model.state_dict(), 'model-000001.pt')
 
 # Generate
 model.eval()
-start = 'The salesperson'
-start_ids = encoding.encode(start)
-x = (torch.tensor(start_ids, dtype=torch.long, device=device)[None, ...])
-y = model.generate(x, max_new_tokens=100)
-print('---------------')
-print(encoding.decode(y[0].tolist()))
-print('---------------')
+# start = 'The salesperson'
+# start_ids = encoding.encode(start)
+# x = (torch.tensor(start_ids, dtype=torch.long, device=device)[None, ...])
+# y = model.generate(x, max_new_tokens=100)
+# print('---------------')
+# print(encoding.decode(y[0].tolist()))
+# print('---------------')

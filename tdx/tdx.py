@@ -106,6 +106,9 @@ def get_k(market,code,start_date,end_date):
     else:
         stock_k = pd.read_csv('../datas/sz/day/' + code + '.csv')
 
+    stock_k = stock_k[(stock_k['date'] >= start_date) & (stock_k['date'] <= end_date)]
+
+    # print(stock_k)
     return stock_k
 
 
@@ -115,9 +118,9 @@ def save_ks(market,start_date,end_date):
     for code in stock_list['code']:
         # code = stock_list['code'].iloc[i]
         save_k(market,code,start_date,end_date)
-        if code == '301633':
-            print(code)
-        print(code)
+        # if code == '301633':
+        #     print(code)
+        # print(code)
     api.disconnect()  # 手动断开连接
 
 
@@ -128,6 +131,7 @@ if __name__ == '__main__':
     # save_k(0,'301633','2024-01-01','2024-12-31')
     # save_k(0,'301585','2024-01-01','2024-12-31')
     # save_ks(0,'2024-01-01','2024-12-31')
-    # save_k(0,'000001','2024-01-01','2024-12-31')
-    save_k(0,'000001','2019-01-01','2024-12-31')
+    save_k(0,'000001','2018-01-01','2023-12-31')
+    # save_k(0,'000001','2019-01-01','2024-12-31')
     # save_ks(1,'2024-01-01','2024-12-31')
+    # get_k(0,'000001','2019-01-01','2024-12-31')

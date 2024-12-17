@@ -79,7 +79,7 @@ def runstrat():
         print(dataframe)
         print('--------------------------------------------------')
 
-    # Pass it to the backtrader datafeed and add it to the cerebro
+    # Pass it to the bt datafeed and add it to the cerebro
     data = PandasDataOptix(dataname=dataframe)
 
     cerebro.adddata(data)
