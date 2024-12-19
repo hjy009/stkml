@@ -100,7 +100,42 @@ def save_k(market,code,start_date,end_date):
     else:
         df.to_csv('../datas/sz/day/' + code + '.csv')
 
-def get_k(market,code,start_date,end_date):
+def get_xdxr_factors(market,code):
+    #除权因子
+    ordered_dict_list = api.get_xdxr_info(market, code)
+    # print(ordered_dict_list)
+    # 初始化DataFrame
+    # 初始化DataFrame
+    xdxr_factors = pd.DataFrame(columns=['date', 'single_factor'])
+
+    # 遍历除权信息
+    for idx, item in enumerate(ordered_dict_list):
+        year = item['year']
+        month = item['month']
+        day = item['day']
+        fenhong = item['fenhong']
+        peigujia = item['peigujia']
+        songzhuangu = item['songzhuangu']
+        peigu = item['peigu']
+
+        # 计算单个除权事件的复权因子
+        cash_dividend_factor = 1.0 if fenhong is None else 1 + fenhong
+        rights_issue_factor = 1.0 if peigujia is None else 1 + peigujia
+        bonus_issue_factor = 1.0 if songzhuangu is None else 10 / (10 + songzhuangu)
+
+        # 计算总的复权因子
+        single_factor = 1.0 / (cash_dividend_factor * rights_issue_factor * bonus_issue_factor)
+
+        # 将数据添加到DataFrame中
+        xdxr_factors.loc[idx] = [pd.to_datetime(f'{year}-{month:02d}-{day:02d}'), single_factor]
+
+    # 打印DataFrame
+    # print(xdxr_factors)
+    # 确保xdxr_factors是按日期排序的
+    xdxr_factors = xdxr_factors.sort_values(by='date')
+    return xdxr_factors
+
+def load_k(market,code,start_date,end_date):
     if market == 1 :
         stock_k = pd.read_csv('../datas/sh/day/'+code+'.csv')
     else:
@@ -111,6 +146,47 @@ def get_k(market,code,start_date,end_date):
     # print(stock_k)
     return stock_k
 
+def get_k(market,code,start_date,end_date):
+    #前复权
+    xdxr_factors = get_xdxr_factors(market,code)
+
+    df_stock = load_k(market,code,start_date,end_date)
+
+    # 将日期列设置为索引，并确保它是DatetimeIndex类型
+    df_stock['date'] = pd.to_datetime(df_stock['date'])
+    df_stock.set_index('date', inplace=True)
+    # 初始化前复权收盘价列
+    df_stock['close_adj'] = 0.0
+
+    # 应用复权因子到收盘价
+    for idx, row in xdxr_factors.iterrows():
+        mask = df_stock.index >= row['date']
+        df_stock.loc[mask, 'close_adj'] = df_stock.loc[mask, 'close'] / row['single_factor']
+
+    # 打印前复权后的DataFrame
+    # print(df_stock)
+    return df_stock
+
+def get_k_back(market,code,start_date,end_date):
+    #后复权
+    xdxr_factors = get_xdxr_factors(market,code)
+
+    df_stock = load_k(market,code,start_date,end_date)
+
+    # 将日期列设置为索引，并确保它是DatetimeIndex类型
+    df_stock['date'] = pd.to_datetime(df_stock['date'])
+    df_stock.set_index('date', inplace=True)
+    # 初始化前复权收盘价列
+    df_stock['close_adj'] = 0.0
+
+    # 应用复权因子到收盘价
+    for idx, row in xdxr_factors.iterrows():
+        mask = df_stock.index >= row['date']
+        df_stock.loc[mask, 'close_adj'] = df_stock.loc[mask, 'close'] * row['single_factor']
+
+    # 打印前复权后的DataFrame
+    # print(df_stock)
+    return df_stock
 
 def save_ks(market,start_date,end_date):
     # 获取数据
@@ -124,14 +200,13 @@ def save_ks(market,start_date,end_date):
     api.disconnect()  # 手动断开连接
 
 
-
 if __name__ == '__main__':
     # save_stocklist()
     # get_stocklist(0)
     # save_k(0,'301633','2024-01-01','2024-12-31')
     # save_k(0,'301585','2024-01-01','2024-12-31')
     # save_ks(0,'2024-01-01','2024-12-31')
-    save_k(0,'000001','1991-05-15','2024-12-31')
+    # save_k(0,'000001','1991-05-15','2024-12-31')
     # save_k(0,'000001','2019-01-01','2024-12-31')
     # save_ks(1,'2024-01-01','2024-12-31')
-    # get_k(0,'000001','2019-01-01','2024-12-31')
+    get_k(0,'000001','1991-05-15','2024-12-31')

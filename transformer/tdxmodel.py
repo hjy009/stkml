@@ -142,7 +142,7 @@ class TransformerLanguageModel(nn.Module):
         self.max_token_value = max_token_value
         # Set up token embedding look-up table
         # self.token_embedding_lookup_table = nn.Embedding(num_embeddings=self.max_token_value + 1, embedding_dim=self.d_model)
-        self.token_embedding_lookup_table = nn.Embedding(num_embeddings=self.max_token_value , embedding_dim=self.d_model)
+        self.token_embedding_lookup_table = nn.Embedding(num_embeddings=self.max_token_value + 1, embedding_dim=self.d_model)
 
         # Run all the transformer blocks
         # Different from original paper, here we add a final layer norm after all the blocks
