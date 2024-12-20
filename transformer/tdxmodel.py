@@ -21,7 +21,12 @@ TORCH_SEED = 1337
 torch.manual_seed(TORCH_SEED)
 
 stock_k = tdx.get_k(0, '000001', '1991-05-15','2024-12-31')
-tokenized_text = stock_k['close'].diff()
+diff_close = stock_k['close'].diff()
+# 计算收盘价与开盘价之差
+close_open_diff = stock_k['close'] - stock_k['open']
+# 将收盘价差分小于-10和大于10的部分替换为收盘价与开盘价之差
+diff_close[(diff_close < -10) | (diff_close > 10)] = close_open_diff[(diff_close < -10) | (diff_close > 10)]
+tokenized_text = diff_close
 tokenized_text.iloc[0] = 0
 tokenized_text = (tokenized_text + 10) * 100
 # tokenized_text = tokenized_text.astype(int)
@@ -247,6 +252,7 @@ for step in range(max_iters):
 torch.save(model.state_dict(), 'model-000001.pt')
 
 # Generate
+model.load_state_dict('model-000001.pt')
 model.eval()
 # start = 'The salesperson'
 # start_ids = encoding.encode(start)

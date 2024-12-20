@@ -1,6 +1,6 @@
 import pandas as pd
 from pytdx.hq import TdxHq_API
-from datetime import datetime
+from datetime import datetime, timedelta
 
 def connet():
     api = TdxHq_API()
@@ -147,21 +147,21 @@ def load_k(market,code,start_date,end_date):
     return stock_k
 
 def get_k(market,code,start_date,end_date):
-    #前复权
-    xdxr_factors = get_xdxr_factors(market,code)
+    # 前复权
+    # xdxr_factors = get_xdxr_factors(market,code)
 
     df_stock = load_k(market,code,start_date,end_date)
 
     # 将日期列设置为索引，并确保它是DatetimeIndex类型
-    df_stock['date'] = pd.to_datetime(df_stock['date'])
-    df_stock.set_index('date', inplace=True)
+    # df_stock['date'] = pd.to_datetime(df_stock['date'])
+    # df_stock.set_index('date', inplace=True)
     # 初始化前复权收盘价列
-    df_stock['close_adj'] = 0.0
-
+    # df_stock['close_adj'] = 0.0
+    #
     # 应用复权因子到收盘价
-    for idx, row in xdxr_factors.iterrows():
-        mask = df_stock.index >= row['date']
-        df_stock.loc[mask, 'close_adj'] = df_stock.loc[mask, 'close'] / row['single_factor']
+    # for idx, row in xdxr_factors.iterrows():
+    #     mask = df_stock.index >= row['date']
+    #     df_stock.loc[mask, 'close_adj'] = df_stock.loc[mask, 'close'] / row['single_factor']
 
     # 打印前复权后的DataFrame
     # print(df_stock)
@@ -210,3 +210,4 @@ if __name__ == '__main__':
     # save_k(0,'000001','2019-01-01','2024-12-31')
     # save_ks(1,'2024-01-01','2024-12-31')
     get_k(0,'000001','1991-05-15','2024-12-31')
+
