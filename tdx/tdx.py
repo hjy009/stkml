@@ -11,6 +11,8 @@ def connet():
         print("连接失败，请检查服务器地址和端口。")
         return None
 
+api = connet()
+
 def save_stocklist():
     # 参数说明
 
@@ -27,7 +29,6 @@ def save_stocklist():
     # 表示从第101条数据开始获取。
 
     # 获取数据
-    api = connet()
     if api == None:
        exit
     # 获取代码列表
@@ -67,7 +68,7 @@ def get_stocklist(market):
         stock_list['code'] = stock_list['code'].astype(str)
 
         # 筛选出以'00'和'30'开头的股票代码
-        filtered_stocks = stock_list[stock_list['code'].str.startswith(('00', '30'))]
+        filtered_stocks = stock_list[stock_list['code'].str.startswith(('60', '68'))]
         # 去除 'code' 列的重复项
         filtered_stocks = filtered_stocks.drop_duplicates(subset='code', keep='first')
 
@@ -89,7 +90,17 @@ def get_stocklist(market):
         # print(filtered_stocks)
     return filtered_stocks
 
-api = connet()
+def get_market(code):
+    for mid in range(0,2):
+        stock_list = get_stocklist(mid)
+        market_index = (stock_list['code'] == code)
+        if market_index.any():
+            market = mid
+            # first_true_index = market_index.idxmax()
+            # market = stock_list.loc[first_true_index, 'code']
+            # print(market)
+            break
+    return market
 
 def save_k(market,code,start_date,end_date):
     data = api.get_k_data(code, start_date, end_date)
@@ -188,7 +199,7 @@ def get_k_back(market,code,start_date,end_date):
     # print(df_stock)
     return df_stock
 
-def save_ks(market,start_date,end_date):
+def save_market_ks(market,start_date,end_date):
     # 获取数据
     stock_list = get_stocklist(0)
     for code in stock_list['code']:
@@ -199,6 +210,29 @@ def save_ks(market,start_date,end_date):
         # print(code)
     api.disconnect()  # 手动断开连接
 
+def save_ks(codes,start_date,end_date):
+    for code in codes:
+        market = get_market(code)
+        # code = stock_list['code'].iloc[i]
+        save_k(market,code,start_date,end_date)
+        # if code == '301633':
+        #     print(code)
+        print(code)
+
+def get_blockinfo(blockname = ''):
+    data = api.get_and_parse_block_info("block.dat")
+    # print(data)  # 打印板块信息
+    # 将OrderedDict转换为DataFrame
+    df = pd.DataFrame(data)
+    if blockname == '' :
+        df_charging_pile = df
+    else:
+        # 筛选出blockname为“充电桩”的数据
+        df_charging_pile = df[df['blockname'] == blockname]
+
+        # 显示结果
+    # print(df_charging_pile)
+    return df_charging_pile
 
 if __name__ == '__main__':
     # save_stocklist()
@@ -209,5 +243,8 @@ if __name__ == '__main__':
     # save_k(0,'000001','1991-05-15','2024-12-31')
     # save_k(0,'000001','2019-01-01','2024-12-31')
     # save_ks(1,'2024-01-01','2024-12-31')
-    get_k(0,'000001','1991-05-15','2024-12-31')
-
+    # get_k(0,'000001','1991-05-15','2024-12-31')
+    # get_market('600518')
+    # infos = get_blockinfo('充电桩')
+    infos = get_blockinfo('创新药')
+    save_ks(infos['code'],'1991-05-15','2024-12-31')

@@ -1,6 +1,6 @@
 import numpy as np
 import math, sys, os
-import tushare as ts
+import wdt as ts
 import pandas as pd
 import datetime as dt
 from pandas import read_csv
@@ -69,7 +69,7 @@ def load_stock_data_from_file(file):
    return df
 
 def load_stock_data_from_network(code, kline_type):
-   df = ts.get_k_data(code, '19900101', '', ktype=kline_type)
+   df = wdt.get_k_data(code, '19900101', '', ktype=kline_type)
    if len(df) > 0:
       # 把收盘价放最低价后面，保持和同花顺一致顺序
       cols = list(df)
@@ -800,7 +800,7 @@ Options:
   -tv                      输出详细交易细节
   -t0                      是否支持T+0交易
   -cost                    交易成本
-  -ts                      数据起始时间(start)
+  -wdt                      数据起始时间(start)
   -te                      数据结束时间(end)
   -yp                      输出每年的收益情况(year profit)
   -w                       交易数据从网络获取
@@ -975,13 +975,13 @@ def main():
                   pass
 
                i += 1
-         elif x == '-ts' or x == '-te':
+         elif x == '-wdt' or x == '-te':
             if i+1 < len(argv):
                d = cvt_to_date(argv[i+1])
                if len(d) != 10:
                   print("非法日期参数:", argv[i+1])
                   quit()
-               if x == '-ts':
+               if x == '-wdt':
                   tran_date_start = d
                else:
                   tran_date_end = d

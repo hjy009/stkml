@@ -1,6 +1,6 @@
 ﻿import numpy as np
 import math, sys, os
-import tushare as ts
+import wdt as ts
 import pandas as pd
 import datetime as dt
 from pandas import read_csv
@@ -43,7 +43,7 @@ def load_stock_data_from_file(file):
    return df
 
 def load_stock_data_from_network(code, kline_type):
-   df = ts.get_k_data(code, '19900101', '', ktype=kline_type)
+   df = wdt.get_k_data(code, '19900101', '', ktype=kline_type)
    if len(df) > 0:
       # 把收盘价放最低价后面，保持和同花顺一致顺序
       cols = list(df)

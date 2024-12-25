@@ -110,7 +110,7 @@ def parse_args():
                         type=float,
                         help='Use as fill volume for missing bar (def: 0.0)')
 
-    parser.add_argument('--tstart', '-ts',
+    parser.add_argument('--tstart', '-wdt',
                         # default='09:14:59',
                         # help='Start time for the Session Filter (%H:%M:%S)')
                         default='09:15',
