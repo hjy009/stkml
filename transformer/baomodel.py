@@ -151,6 +151,7 @@ class TransformerLanguageModel(nn.Module):
         position_encoding_lookup_table[:, 1::2] = torch.cos(position * div_term)
         # change position_encoding_lookup_table from (context_length, d_model) to (T, d_model)
         position_embedding = position_encoding_lookup_table[:T, :].to(device)
+        # print(idx)
         x = self.token_embedding_lookup_table(idx) + position_embedding
         x = self.transformer_blocks(x)
         # The "logits" are the output values of our model before applying softmax

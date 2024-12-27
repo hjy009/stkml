@@ -13,10 +13,11 @@ close_open_diff = stock_k['close'] - stock_k['open']
 diff_close[(diff_close < -10) | (diff_close > 10)] = close_open_diff[(diff_close < -10) | (diff_close > 10)]
 tokenized_text = diff_close
 tokenized_text.iloc[0] = 0
-tokenized_text = (tokenized_text + 10) * 100
+# tokenized_text = (tokenized_text + 10) * 100
+
 # tokenized_text = tokenized_text.astype(int)
 # tokenized_text = range(-10,10,0.01)
-tokenized_text = torch.tensor(tokenized_text, dtype=torch.long, device=bm.device)  # put tokenized text into tensor
+tokenized_text = torch.tensor(tokenized_text, dtype=torch.float, device=bm.device)  # put tokenized text into tensor
 # max_token_value = max(tokenized_text) + 1  # the maximum value of the tokenized numbers
 
 # Split train and validation
