@@ -13,7 +13,7 @@ num_blocks = 8  # Number of transformer blocks
 num_heads = 4  # Number of heads in Multi-head attention
 learning_rate = 1e-3  # 0.001
 dropout = 0.1  # Dropout rate
-max_iters = 3000  # Total of training iterations <- Change this to smaller number for testing
+max_iters = 1000  # Total of training iterations <- Change this to smaller number for testing
 eval_interval = 50  # How often to evaluate
 eval_iters = 20  # Number of iterations to average for evaluation
 device = 'cuda' if torch.cuda.is_available() else 'cpu'  # Use GPU if it's available.
@@ -252,7 +252,7 @@ for step in range(max_iters):
 torch.save(model.state_dict(), 'model-000001.pt')
 
 # Generate
-model.load_state_dict('model-000001.pt')
+model.load_state_dict(torch.load( 'model-000001.pt', weights_only=True))
 model.eval()
 # start = 'The salesperson'
 # start_ids = encoding.encode(start)
