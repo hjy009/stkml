@@ -63,13 +63,27 @@ class Encoding:
 
         return decoded_indices
 
+    def decode_ranges(self, indices):
+        """
+        将解码返回的索引序列转换为对应的范围序列。
+        :param indices: 输入的索引序列。
+        :return: 对应的范围序列。
+        """
+        if not self.encoded_ranges:
+            raise ValueError("No encoded ranges found. Please run encode() first.")
+
+        # 获取范围序列
+        ranges = [self.encoded_ranges[idx] for idx in indices if idx in self.encoded_ranges]
+        return ranges
+
 if __name__ == '__main__':
     # 定义域为 [-10, 10]
     encoder = Encoding(domain_start=-10, domain_end=10)
 
     # 输入乱序且包含重复数字的序列
     numbers = [0, -8, 4, -4, 8, -8, 0]
-
+    # numbers = [ 311,  262,  465,  353,  333,  365,  388,  276,  358,  352,  274,
+    #     249,  311,  321,  341,  361, 1182]
     # 对数字序列进行编码
     encoder.encode(numbers)
 
@@ -83,7 +97,13 @@ if __name__ == '__main__':
     print("\nDecoded Indices for Value -9:")
     print(decoded_single)
 
-    # 解码数列
+    # 将解码索引序列转换为范围序列
+    decoded_ranges_single = encoder.decode_ranges(decoded_single)
+    print("\nDecoded Ranges for Indices [0]:")
+    print(decoded_ranges_single)
+
+    # 解码数列并转换为范围序列
     decoded_list = encoder.decode([-9, 5])
-    print("\nDecoded Indices for Values [-9, 5]:")
-    print(decoded_list)
+    decoded_ranges_list = encoder.decode_ranges(decoded_list)
+    print("\nDecoded Ranges for Values [-9, 5]:")
+    print(decoded_ranges_list)

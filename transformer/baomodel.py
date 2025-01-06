@@ -3,6 +3,7 @@ import torch
 import torch.nn as nn
 from torch.nn import functional as F
 import pandas as pd
+from transformer import encode as ec
 
 # Hyperparameters
 batch_size = 4  # How many batches per training step
@@ -18,7 +19,20 @@ eval_iters = 20  # Number of iterations to average for evaluation
 device = 'cuda' if torch.cuda.is_available() else 'cpu'  # Use GPU if it's available.
 TORCH_SEED = 1337
 torch.manual_seed(TORCH_SEED)
-max_token_value = (10 + 10) * 100  # the maximum value of the tokenized numbers
+
+stock_file = '../datas/bao/sh.600000.csv'
+# max_token_value = (10 + 10) * 100  # the maximum value of the tokenized numbers
+stock_k = pd.read_csv(stock_file)
+diff_close = stock_k['close'].diff()
+# 计算收盘价与开盘价之差
+close_open_diff = stock_k['close'] - stock_k['open']
+# 将收盘价差分小于-10和大于10的部分替换为收盘价与开盘价之差
+diff_close[(diff_close < -10) | (diff_close > 10)] = close_open_diff[(diff_close < -10) | (diff_close > 10)]
+diff_close.iloc[0] = 0
+split_idx = int(len(diff_close) * 0.9)
+encoder = ec.Encoding(domain_start=-10.00, domain_end=10.00)
+encoder.encode(diff_close[:split_idx])
+max_token_value = len(encoder.encoded_ranges)
 
 
 # Define Feed Forward Network
