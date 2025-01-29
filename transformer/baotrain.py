@@ -4,26 +4,22 @@ import torch.nn as nn
 from torch.nn import functional as F
 import pandas as pd
 import baomodel as bm
+import encode as ec
 
-stock_k = pd.read_csv('../datas/bao/sh.600000.csv')
-diff_close = stock_k['close'].diff()
-# 计算收盘价与开盘价之差
-close_open_diff = stock_k['close'] - stock_k['open']
-# 将收盘价差分小于-10和大于10的部分替换为收盘价与开盘价之差
-diff_close[(diff_close < -10) | (diff_close > 10)] = close_open_diff[(diff_close < -10) | (diff_close > 10)]
-tokenized_text = diff_close
-tokenized_text.iloc[0] = 0
+# tokenized_text = encoder.decode([-9.1, 5.2])
+tokenized_text = bm.encoder.decode(bm.diff_close)
+# tokenized_text.iloc[0] = 0
 # tokenized_text = (tokenized_text + 10) * 100
 
 # tokenized_text = tokenized_text.astype(int)
 # tokenized_text = range(-10,10,0.01)
-tokenized_text = torch.tensor(tokenized_text, dtype=torch.float, device=bm.device)  # put tokenized text into tensor
+tokenized_text = torch.tensor(tokenized_text, dtype=torch.long, device=bm.device)  # put tokenized text into tensor
 # max_token_value = max(tokenized_text) + 1  # the maximum value of the tokenized numbers
 
 # Split train and validation
-split_idx = int(len(tokenized_text) * 0.9)
-train_data = tokenized_text[:split_idx]
-val_data = tokenized_text[split_idx:]
+# split_idx = int(len(tokenized_text) * 0.9)
+train_data = tokenized_text[:bm.split_idx]
+val_data = tokenized_text[bm.split_idx:]
 
 # Initialize the model
 model = bm.TransformerLanguageModel()
