@@ -124,25 +124,25 @@ if __name__ == '__main__':
     print("\nDecoded Indices for Value -9:")
     print(decoded_single)
 
-# 对数字序列进行编码
-encoder.encode(numbers)
+    # 对数字序列进行编码
+    encoder.encode(numbers)
 
-# 输出保存的编码范围
-print("Encoded Ranges (by index):")
-for idx, range_ in encoder.encoded_ranges.items():
-    print(f"Index {idx}: Range {range_}")
+    # 输出保存的编码范围
+    print("Encoded Ranges (by index):")
+    for idx, range_ in encoder.encoded_ranges.items():
+        print(f"Index {idx}: Range {range_}")
 
-# 解码单个值
-decoded_single = encoder.decode(9)
-print("\nDecoded Indices for Value 9:")
-print(decoded_single)
+    # 解码单个值
+    decoded_single = encoder.decode(9)
+    print("\nDecoded Indices for Value 9:")
+    print(decoded_single)
 
-# 解码数列
-decoded_list = encoder.decode([9, 29,39])
-print("\nDecoded Indices for Values [9, 29]:")
-print(decoded_list)
+    # 解码数列
+    decoded_list = encoder.decode([9, 29,39])
+    print("\nDecoded Indices for Values [9, 29]:")
+    print(decoded_list)
 
-print(encoder.encoded_ranges[decoded_list[0]])
+    print(encoder.encoded_ranges[decoded_list[0]])
     # 将解码索引序列转换为范围序列
     decoded_ranges_single = encoder.decode_ranges(decoded_single)
     print("\nDecoded Ranges for Indices [0]:")
